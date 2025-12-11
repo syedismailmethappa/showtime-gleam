@@ -1,13 +1,57 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
+import Navbar from '@/components/Navbar';
+import HeroCarousel from '@/components/HeroCarousel';
+import EventsSection from '@/components/EventsSection';
+import SeatSelection from '@/components/SeatSelection';
+import { BookingProvider, useBooking } from '@/contexts/BookingContext';
+import { Event } from '@/data/events';
+
+const TicketApp = () => {
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const { setSelectedEvent: setContextEvent, clearSelection } = useBooking();
+
+  const handleSelectEvent = (event: Event) => {
+    setSelectedEvent(event);
+    setContextEvent(event);
+  };
+
+  const handleCloseSelection = () => {
+    setSelectedEvent(null);
+    setContextEvent(null);
+    clearSelection();
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      
+      <main className="pt-16">
+        <HeroCarousel onSelectEvent={handleSelectEvent} />
+        <EventsSection onSelectEvent={handleSelectEvent} />
+      </main>
+
+      {/* Footer */}
+      <footer className="py-12 border-t border-border">
+        <div className="container mx-auto px-4 text-center text-muted-foreground">
+          <p className="text-sm">© 2024 TicketVerse. All rights reserved.</p>
+        </div>
+      </footer>
+
+      <AnimatePresence>
+        {selectedEvent && (
+          <SeatSelection event={selectedEvent} onClose={handleCloseSelection} />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <BookingProvider>
+      <TicketApp />
+    </BookingProvider>
   );
 };
 
